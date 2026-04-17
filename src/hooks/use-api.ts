@@ -13,7 +13,7 @@ export function usePollingQuery<T>(key: string[], path: string, params?: Record<
   const programId = getSelectedProgram();
   return useQuery<T>({
     queryKey: [...key, programId, params],
-    queryFn: () => apiFetch<T>(path, { program_id: programId, ...params }),
+    queryFn: () => apiFetch<T>(path, { query: { program_id: programId, ...params } }),
     enabled: !!programId && enabled,
     refetchInterval: 30000,
     staleTime: 10000,

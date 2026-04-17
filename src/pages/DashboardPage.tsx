@@ -2,15 +2,18 @@ import { usePollingQuery } from "@/hooks/use-api";
 import { StatCard } from "@/components/StatCard";
 import { SeverityBadge } from "@/components/SeverityBadge";
 import { CardSkeleton, LoadingSkeleton } from "@/components/LoadingSkeleton";
-import { Globe, Bug, KeyRound, GitBranch, Network, Activity, Shield } from "lucide-react";
+import { EmptyState } from "@/components/EmptyState";
+import { useState } from "react";
 import { relativeTime, absoluteTime } from "@/lib/time";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { Search, X, Globe, Activity, Bug, Shield, KeyRound, GitBranch, Network } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Cell, ResponsiveContainer } from "recharts";
+import { cn } from "@/lib/utils";
 
 export default function DashboardPage() {
   const { data: assetStats, isLoading: al } = usePollingQuery<any>(["asset-stats"], "/api/v1/assets/stats");
   const { data: findingStats, isLoading: fl } = usePollingQuery<any>(["finding-stats"], "/api/v1/findings/stats/summary");
-  const { data: secrets } = usePollingQuery<any>(["secrets-dash"], "/api/v1/secrets/", { limit: 5, is_new: true });
-  const { data: leaks } = usePollingQuery<any>(["leaks-dash"], "/api/v1/leaks/", { limit: 5, is_new: true });
+  const { data: secretsStats } = usePollingQuery<any>(["secrets-stats"], "/api/v1/secrets/stats");
+  const { data: leaksStats } = usePollingQuery<any>(["leaks-stats"], "/api/v1/leaks/stats");
   const { data: portStats } = usePollingQuery<any>(["port-stats"], "/api/v1/portfindings/stats");
   const { data: findings } = usePollingQuery<any>(["findings-recent"], "/api/v1/findings/", { limit: 10 });
 
@@ -32,8 +35,8 @@ export default function DashboardPage() {
           <StatCard label="Alive" value={assetStats?.alive ?? 0} icon={Activity} to="/assets" accentClass="text-severity-low" />
           <StatCard label="Critical" value={findingStats?.by_severity?.critical ?? 0} icon={Bug} to="/findings" accentClass="text-severity-critical" />
           <StatCard label="High" value={findingStats?.by_severity?.high ?? 0} icon={Shield} to="/findings" accentClass="text-severity-high" />
-          <StatCard label="Secrets" value={secrets?.total ?? 0} icon={KeyRound} to="/secrets" accentClass="text-severity-medium" />
-          <StatCard label="GH Leaks" value={leaks?.total ?? 0} icon={GitBranch} to="/leaks" />
+          <StatCard label="Secrets" value={secretsStats?.total ?? 0} icon={KeyRound} to="/secrets" accentClass="text-severity-medium" />
+          <StatCard label="GH Leaks" value={leaksStats?.total ?? 0} icon={GitBranch} to="/leaks" />
           <StatCard label="Open Ports" value={portStats?.total ?? 0} icon={Network} to="/ports" />
         </div>
       )}

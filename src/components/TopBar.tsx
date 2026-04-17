@@ -1,18 +1,9 @@
 import { ProgramSelector } from "./ProgramSelector";
 import { useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
 import { Circle } from "lucide-react";
 
 export function TopBar() {
   const qc = useQueryClient();
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-
-  useEffect(() => {
-    const unsub = qc.getQueryCache().subscribe(() => {
-      setLastUpdated(new Date());
-    });
-    return () => unsub();
-  }, [qc]);
 
   const handleProgramChange = () => {
     qc.invalidateQueries();
@@ -28,7 +19,7 @@ export function TopBar() {
           <span>Live</span>
         </div>
         <span className="text-xs text-muted-foreground">
-          Updated {lastUpdated.toLocaleTimeString()}
+          Ready
         </span>
       </div>
     </header>

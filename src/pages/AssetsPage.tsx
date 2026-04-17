@@ -24,6 +24,19 @@ export default function AssetsPage() {
     !search || a.domain?.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Map backend sources to displayable names
+  const assetSourceMap: Record<string, string> = {
+    subfinder: "Subfinder",
+    crtsh: "crt.sh",
+    shodan: "Shodan",
+    amass: "Amass",
+    chaos: "Chaos",
+    katana: "Katana",
+    gau: "GAU",
+    waybackurls: "Waybackurls",
+    // Add any other sources if they exist in the backend models
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
@@ -38,7 +51,7 @@ export default function AssetsPage() {
           <input
             type="text" value={search} onChange={(e) => setSearch(e.target.value)}
             placeholder="Search domains..."
-            className="w-full rounded-md border border-border bg-card py-2 pl-9 pr-3 text-sm text-foreground outline-none focus:border-primary"
+            className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
           />
         </div>
         {[{ val: "alive", label: "Alive" }, { val: "dead", label: "Dead" }, { val: "", label: "All" }].map(f => (
@@ -69,6 +82,7 @@ export default function AssetsPage() {
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Interest</th>
                   <th className="px-4 py-3">HTTP</th>
+                  <th className="px-4 py-3 lg:table-cell">Sources</th> {/* Added Sources column */}
                   <th className="hidden px-4 py-3 lg:table-cell">Technologies</th>
                   <th className="hidden px-4 py-3 md:table-cell">Title</th>
                   <th className="px-4 py-3">First Seen</th>
@@ -84,6 +98,13 @@ export default function AssetsPage() {
                     </td>
                     <td className="px-4 py-3"><SeverityBadge severity={a.interest_level || "unknown"} /></td>
                     <td className="px-4 py-3 text-muted-foreground">{a.http_status || "—"}</td>
+                    <td className="px-4 py-3"> {/* Sources column */}
+                      <div className="flex flex-wrap gap-1">
+                        {(a.sources || []).slice(0, 2).map((s: string) => (
+                          <span key={s} className="rounded bg-accent px-1.5 py-0.5 text-[10px] text-muted-foreground">{assetSourceMap[s] || s}</span>
+                        ))}
+                      </div>
+                    </td>
                     <td className="hidden px-4 py-3 lg:table-cell">
                       <div className="flex flex-wrap gap-1">
                         {(a.technologies || []).slice(0, 3).map((t: string) => (
@@ -122,6 +143,15 @@ export default function AssetsPage() {
                 ["HTTP Status", selected.http_status],
                 ["Title", selected.http_title],
                 ["Interest Level", selected.interest_level],
+                ["Web Server", selected.web_server], // Added
+                ["CDN Provider", selected.cdn_provider], // Added
+                ["Content Length", selected.content_length !== null ? `${selected.content_length} bytes` : "—"], // Added
+                ["Response Time", selected.response_time_ms !== null ? `${selected.response_time_ms} ms` : "—"], // Added
+                ["Redirect URL", selected.redirect_url], // Added
+                ["Favicon Hash", selected.favicon_hash], // Added
+                ["Last Probed", selected.last_probed ? relativeTime(selected.last_probed) : "—"], // Added
+                ["Last Crawled", selected.last_crawled ? relativeTime(selected.last_crawled) : "—"], // Added
+                ["Last Scan Run", selected.last_scan_run], // Added
               ].map(([k, v]) => (
                 <div key={k as string}><span className="text-muted-foreground">{k}: </span><span className="text-foreground">{v || "—"}</span></div>
               ))}
@@ -149,6 +179,15 @@ export default function AssetsPage() {
                 <div>
                   <span className="text-muted-foreground">IPs:</span>
                   <div className="mt-1 font-mono text-xs text-foreground">{selected.ip_addresses.join(", ")}</div>
+                </div>
+              )}
+              {/* Body Preview - handle potential large content */}
+              {selected.body_preview && (
+                <div>
+                  <span className="text-muted-foreground">Body Preview:</span>
+                  <pre className="mt-1 max-h-32 w-full overflow-auto whitespace-pre-wrap break-words rounded border border-border bg-surface-elevated p-2 text-xs text-foreground">
+                    {selected.body_preview}
+                  </pre>
                 </div>
               )}
             </div>

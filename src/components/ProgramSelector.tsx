@@ -1,25 +1,17 @@
 import { usePrograms } from "@/hooks/use-api";
 import { getSelectedProgram, setSelectedProgram } from "@/lib/api";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
 export function ProgramSelector({ onChange }: { onChange?: (id: string) => void }) {
   const { data } = usePrograms();
   const [selected, setSelected] = useState(getSelectedProgram());
 
-  useEffect(() => {
-    if (!selected && data?.programs?.length) {
-      const first = data.programs[0].program_id;
-      setSelected(first);
-      setSelectedProgram(first);
-      onChange?.(first);
-    }
-  }, [data, selected, onChange]);
-
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelected(e.target.value);
-    setSelectedProgram(e.target.value);
-    onChange?.(e.target.value);
+    const value = e.target.value;
+    setSelected(value);
+    setSelectedProgram(value);
+    onChange?.(value);
   };
 
   return (

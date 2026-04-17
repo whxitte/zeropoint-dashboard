@@ -19,11 +19,11 @@ export default function ReportPage() {
 
     try {
       const [findings, secrets, leaks, ports, dorks] = await Promise.all([
-        apiFetch<any>("/api/v1/findings/", params),
-        apiFetch<any>("/api/v1/secrets/", params),
-        apiFetch<any>("/api/v1/leaks/", params),
-        apiFetch<any>("/api/v1/portfindings/", params),
-        apiFetch<any>("/api/v1/dorks/", params),
+        apiFetch<any>("/api/v1/findings/", { query: params }),
+        apiFetch<any>("/api/v1/secrets/", { query: params }),
+        apiFetch<any>("/api/v1/leaks/", { query: params }),
+        apiFetch<any>("/api/v1/portfindings/", { query: params }),
+        apiFetch<any>("/api/v1/dorks/", { query: params }),
       ]);
       setReport({ findings: findings.findings || [], secrets: secrets.secrets || [], leaks: leaks.leaks || [], ports: ports.findings || [], dorks: dorks.results || [], generated: new Date().toISOString() });
     } catch {
